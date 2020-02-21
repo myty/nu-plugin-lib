@@ -1,8 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>Nu.Plugin</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Michael Tyson</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
-   <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>latest</LangVersion>
+    <Description>Library for creating .Net Core console plugins for Nu Shell</Description>
   </PropertyGroup>
 
   <ItemGroup>
