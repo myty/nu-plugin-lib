@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Nu.Plugin
 {
-    public abstract class JsonRpcResponse
+    internal abstract class JsonRpcResponse
     {
         [JsonPropertyName("jsonrpc")]
         public string JsonRPC { get; } = "2.0";

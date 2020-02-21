@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Nu.Plugin.Interfaces;
 
 namespace Nu.Plugin
 {
@@ -12,9 +13,7 @@ namespace Nu.Plugin
 
         private PluginConfiguration _configuration = PluginConfiguration.Create();
 
-        private Func<object> _beginFilter = null;
-        private Func<JsonRpcParams, JsonRpcParams> _filter = null;
-        private Func<object> _endFilter = null;
+        private INuPluginFilter _filter = null;
 
         private NuPlugin(Stream stdin, Stream stdout)
         {
@@ -24,7 +23,7 @@ namespace Nu.Plugin
 
         public async Task RunAsync()
         {
-            using (var standardInput = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding))
+            using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
             {
                 while (true)
                 {
@@ -39,17 +38,17 @@ namespace Nu.Plugin
                     }
                     else if (_configuration.IsFilter && request.Method == "begin_filter")
                     {
-                        OkResponse(_beginFilter());
+                        OkResponse(_filter.BeginFilter());
                     }
                     else if (request.Method == "filter")
                     {
                         var requestParams = request.GetParams<JsonRpcParams>();
 
-                        RpcValueResponse(_filter(requestParams));
+                        RpcValueResponse(_filter.Filter(requestParams));
                     }
                     else if (request.Method == "end_filter")
                     {
-                        OkResponse(_endFilter());
+                        OkResponse(_filter.EndFilter());
                         break;
                     }
                     else
@@ -73,14 +72,12 @@ namespace Nu.Plugin
 
         public static INuPluginBuilder Create(Stream stdin, Stream stdout) => new NuPlugin(stdin, stdout);
 
-        public INuPluginBuilder Filter(Func<object> beginFilter, Func<JsonRpcParams, JsonRpcParams> filter, Func<object> endFilter)
+        public static INuPluginBuilder Create()
         {
-            _configuration = _configuration.WithIsFilter(true);
-            _beginFilter = beginFilter;
-            _filter = filter;
-            _endFilter = endFilter;
+            var stdin = Console.OpenStandardInput();
+            var stdout = Console.OpenStandardOutput();
 
-            return this;
+            return new NuPlugin(stdin, stdout);
         }
 
         public INuPluginBuilder Name(string name)
@@ -92,6 +89,14 @@ namespace Nu.Plugin
         public INuPluginBuilder Usage(string usage)
         {
             _configuration = _configuration.WithUsage(usage);
+            return this;
+        }
+
+        public INuPluginBuilder IsFilter<T>() where T : INuPluginFilter, new()
+        {
+            _configuration = _configuration.WithIsFilter(true);
+            _filter = new T();
+
             return this;
         }
     }

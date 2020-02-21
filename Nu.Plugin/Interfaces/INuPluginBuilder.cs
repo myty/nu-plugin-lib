@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Nu.Plugin.Interfaces;
 
 namespace Nu.Plugin
 {
@@ -9,10 +10,7 @@ namespace Nu.Plugin
 
         INuPluginBuilder Usage(string usage);
 
-        INuPluginBuilder Filter(
-            Func<object> beginFilter,
-            Func<JsonRpcParams, JsonRpcParams> filter,
-            Func<object> endFilter);
+        INuPluginBuilder IsFilter<T>() where T: INuPluginFilter, new();
 
         Task RunAsync();
     }
