@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myty.Nu.Plugin.Len", "Myty.Nu.Plugin.Len\Myty.Nu.Plugin.Len.csproj", "{F260501A-3424-44D5-8D30-11F7C46DEE99}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nu.Plugin", "Nu.Plugin\Nu.Plugin.csproj", "{A5740DCA-A481-4F61-A296-BC9733C9225E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{F260501A-3424-44D5-8D30-11F7C46DEE99}.Release|x64.Build.0 = Release|Any CPU
 		{F260501A-3424-44D5-8D30-11F7C46DEE99}.Release|x86.ActiveCfg = Release|Any CPU
 		{F260501A-3424-44D5-8D30-11F7C46DEE99}.Release|x86.Build.0 = Release|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Debug|x64.Build.0 = Debug|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Debug|x86.Build.0 = Debug|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|x64.ActiveCfg = Release|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|x64.Build.0 = Release|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|x86.ActiveCfg = Release|Any CPU
+		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

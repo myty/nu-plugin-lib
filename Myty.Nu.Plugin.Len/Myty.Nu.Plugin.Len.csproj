@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <ItemGroup>
+    <ProjectReference Include="..\Nu.Plugin\Nu.Plugin.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <AssemblyName>nu_plugin_len</AssemblyName>
     <OutputType>Exe</OutputType>
