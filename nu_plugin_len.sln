@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myty.Nu.Plugin.Len", "Myty.Nu.Plugin.Len\Myty.Nu.Plugin.Len.csproj", "{F260501A-3424-44D5-8D30-11F7C46DEE99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "samples\Nu.Plugin.Len", "samples\Nu.Plugin.Len\Nu.Plugin.Len.csproj", "{F260501A-3424-44D5-8D30-11F7C46DEE99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nu.Plugin", "Nu.Plugin\Nu.Plugin.csproj", "{A5740DCA-A481-4F61-A296-BC9733C9225E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src\Nu.Plugin", "src\Nu.Plugin\Nu.Plugin.csproj", "{A5740DCA-A481-4F61-A296-BC9733C9225E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Myty.Nu.Plugin.Len/Myty.Nu.Plugin.Len.csproj",
+                "${workspaceFolder}/Nu.Plugin.Len/Nu.Plugin.Len.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -28,7 +28,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Myty.Nu.Plugin.Len/Myty.Nu.Plugin.Len.csproj",
+                "${workspaceFolder}/Nu.Plugin.Len/Nu.Plugin.Len.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "-r",
@@ -47,7 +47,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/Myty.Nu.Plugin.Len/Myty.Nu.Plugin.Len.csproj",
+                "${workspaceFolder}/Nu.Plugin.Len/Nu.Plugin.Len.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

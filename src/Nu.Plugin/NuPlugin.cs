@@ -11,6 +11,8 @@ namespace Nu.Plugin
         private readonly Stream _stdin;
         private readonly Stream _stdout;
 
+        private StreamWriter _standardOutputWriter;
+
         private PluginConfiguration _configuration = PluginConfiguration.Create();
 
         private INuPluginFilter _filter = null;
@@ -24,7 +26,10 @@ namespace Nu.Plugin
         public async Task RunAsync()
         {
             using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
+            using (_standardOutputWriter = new StreamWriter(_stdout, Console.OutputEncoding))
             {
+                _standardOutputWriter.AutoFlush = true;
+
                 while (true)
                 {
                     var request = await standardInput.GetNextRequestAsync();
@@ -67,7 +72,7 @@ namespace Nu.Plugin
         {
             var serializedResponse = JsonSerializer.Serialize(response);
 
-            Console.WriteLine(serializedResponse);
+            _standardOutputWriter.WriteLine(serializedResponse);
         }
 
         public static INuPluginBuilder Create(Stream stdin, Stream stdout) => new NuPlugin(stdin, stdout);
