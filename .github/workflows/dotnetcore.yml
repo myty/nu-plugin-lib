@@ -1,9 +1,10 @@
-name: Deploy Nightly Nuget Package
+name: Deploy Nuget Package
 
 on:
   push:
     branches:
       - dev
+      - master
 
 jobs:
   deploy:
@@ -24,4 +25,4 @@ jobs:
     - name: Create Nuget Package
       run: dotnet pack --configuration Release ./src/Nu.Plugin/Nu.Plugin.csproj
     - name: Publish Nuget Package to GPR
-      run: dotnet nuget push ./src/Nu.Plugin/bin/Release/*.nupkg
+      run: dotnet nuget push ./src/Nu.Plugin/bin/Release/*.nupkg -k ${{ secrets.NUGET_ORG_TOKEN }} -s https://nuget.org

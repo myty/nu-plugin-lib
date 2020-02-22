@@ -12,10 +12,6 @@ I used the [sample Python plugin](https://github.com/nushell/contributor-book/bl
 
 Eventually I abstracted the plugin bits into their own class library, which should make it much easier for others to consume and begin making .Net Core Nu Shell plugins.
 
-## Building (Library)
+## Creating Your First Plugin
 
-```cmd
-build
-```
-
-## Getting Started (Plugin)
+`TODO: Add directions here`
