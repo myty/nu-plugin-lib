@@ -7,7 +7,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>latest</LangVersion>
-    <Description>Library for creating .Net Core console plugins for Nu Shell</Description>
+    <Description>Library for creating Nu Shell plugins in .Net Core</Description>
+    <PackageDescription>Library for creating Nu Shell plugins in .Net Core</PackageDescription>
+    <RepositoryUrl>https://github.com/myty/nu-plugin-lib</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

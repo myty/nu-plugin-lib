@@ -1,12 +1,13 @@
-name: Deploy Nightly Nuget Package
+name: Deploy Nuget Package
 
 on:
   push:
     branches:
       - dev
+      - master
 
 jobs:
-  deploy_nu:
+  deploy:
 
     runs-on: ubuntu-latest
 
@@ -16,5 +17,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.102
-    - name: Build with dotnet
-      run: dotnet build --configuration Release
+        source-url: https://nuget.pkg.github.com/myty/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Build
+      run: dotnet build --configuration Release ./src/Nu.Plugin/Nu.Plugin.csproj
+    - name: Create Nuget Package
+      run: dotnet pack --configuration Release ./src/Nu.Plugin/Nu.Plugin.csproj
+    - name: Publish Nuget Package to GPR
+      run: dotnet nuget push ./src/Nu.Plugin/bin/Release/*.nupkg -k ${{ secrets.NUGET_ORG_TOKEN }} -s https://nuget.org
