@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Nu.Plugin</PackageId>
-    <Version>0.1.0-preview-1</Version>
+    <Version>0.1.0</Version>
     <Authors>Michael Tyson</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
