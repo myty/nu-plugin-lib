@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -6,16 +7,13 @@ using Nu.Plugin.Interfaces;
 
 namespace Nu.Plugin
 {
-    public class NuPlugin : INuPluginBuilder
+    public class NuPlugin
     {
         private readonly Stream _stdin;
         private readonly Stream _stdout;
 
+        private Signature _signature = Signature.Create();
         private StreamWriter _standardOutputWriter;
-
-        private PluginConfiguration _configuration = PluginConfiguration.Create();
-
-        private INuPluginFilter _filter = null;
 
         private NuPlugin(Stream stdin, Stream stdout)
         {
@@ -23,8 +21,31 @@ namespace Nu.Plugin
             _stdin = stdin;
         }
 
-        public async Task RunAsync()
+        public static NuPlugin Build(string name = null)
         {
+            var stdin = Console.OpenStandardInput();
+            var stdout = Console.OpenStandardOutput();
+
+            return new NuPlugin(stdin, stdout).Name(name);
+        }
+
+        public NuPlugin Name(string name)
+        {
+            _signature = _signature.WithName(name);
+            return this;
+        }
+
+        public NuPlugin Description(string description)
+        {
+            _signature = _signature.WithUsage(description);
+            return this;
+        }
+
+        public async Task SinkPluginAsync<T>() where T : INuPluginSink, new()
+        {
+            _signature = _signature.WithIsFilter(true);
+            var sink = new T();
+
             using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
             using (_standardOutputWriter = new StreamWriter(_stdout, Console.OutputEncoding))
             {
@@ -38,22 +59,57 @@ namespace Nu.Plugin
 
                     if (request.Method == "config")
                     {
-                        OkResponse(_configuration);
+                        OkResponse(_signature);
                         break;
                     }
-                    else if (_configuration.IsFilter && request.Method == "begin_filter")
+                    else if (request.Method == "sink")
                     {
-                        OkResponse(_filter.BeginFilter());
+                        var requestParams = request.GetParams<IEnumerable<JsonRpcParams>>();
+                        sink.Sink(requestParams);
+                        break;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        public async Task FilterPluginAsync<T>() where T : INuPluginFilter, new()
+        {
+            _signature = _signature.WithIsFilter(true);
+            var filter = new T();
+
+            using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
+            using (_standardOutputWriter = new StreamWriter(_stdout, Console.OutputEncoding))
+            {
+                _standardOutputWriter.AutoFlush = true;
+
+                while (true)
+                {
+                    var request = await standardInput.GetNextRequestAsync();
+
+                    if (request is null || !request.IsValid) { break; }
+
+                    if (request.Method == "config")
+                    {
+                        OkResponse(_signature);
+                        break;
+                    }
+                    else if (_signature.IsFilter && request.Method == "begin_filter")
+                    {
+                        OkResponse(filter.BeginFilter());
                     }
                     else if (request.Method == "filter")
                     {
                         var requestParams = request.GetParams<JsonRpcParams>();
 
-                        RpcValueResponse(_filter.Filter(requestParams));
+                        RpcValueResponse(filter.Filter(requestParams));
                     }
                     else if (request.Method == "end_filter")
                     {
-                        OkResponse(_filter.EndFilter());
+                        OkResponse(filter.EndFilter());
                         break;
                     }
                     else
@@ -73,36 +129,6 @@ namespace Nu.Plugin
             var serializedResponse = JsonSerializer.Serialize(response);
 
             _standardOutputWriter.WriteLine(serializedResponse);
-        }
-
-        public static INuPluginBuilder Create(Stream stdin, Stream stdout) => new NuPlugin(stdin, stdout);
-
-        public static INuPluginBuilder Create()
-        {
-            var stdin = Console.OpenStandardInput();
-            var stdout = Console.OpenStandardOutput();
-
-            return new NuPlugin(stdin, stdout);
-        }
-
-        public INuPluginBuilder Name(string name)
-        {
-            _configuration = _configuration.WithName(name);
-            return this;
-        }
-
-        public INuPluginBuilder Usage(string usage)
-        {
-            _configuration = _configuration.WithUsage(usage);
-            return this;
-        }
-
-        public INuPluginBuilder IsFilter<T>() where T : INuPluginFilter, new()
-        {
-            _configuration = _configuration.WithIsFilter(true);
-            _filter = new T();
-
-            return this;
         }
     }
 }

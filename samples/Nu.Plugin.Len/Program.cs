@@ -7,11 +7,10 @@ namespace Nu.Plugin.Len
 {
     class Program : INuPluginFilter
     {
-        static async Task Main(string[] args) => await NuPlugin.Create()
-            .Name("len")
-            .Usage("Return the length of a string")
-            .IsFilter<Program>()
-            .RunAsync();
+        static async Task Main() => await NuPlugin
+            .Build("len")
+            .Description("Return the length of a string")
+            .FilterPluginAsync<Program>();
 
         public object BeginFilter() => Array.Empty<string>();
 
