@@ -37,7 +37,7 @@ namespace Nu.Plugin
 
         public NuPlugin Description(string description)
         {
-            _signature = _signature.WithUsage(description);
+            _signature = _signature.WithDescription(description);
             return this;
         }
 
