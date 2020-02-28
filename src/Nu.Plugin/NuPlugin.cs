@@ -41,9 +41,55 @@ namespace Nu.Plugin
             return this;
         }
 
-        public async Task SinkPluginAsync<T>() where T : INuPluginSink, new()
+        public async Task SinkPluginAsync<TSinkPlugin>() where TSinkPlugin : INuPluginSink, new()
         {
-            var sink = new T();
+            await CommandHandler<TSinkPlugin>((req, plugin) =>
+            {
+                if (req.Method == "config")
+                {
+                    OkResponse(_signature);
+                }
+                else if (req.Method == "sink")
+                {
+                    var requestParams = req.GetParams<IEnumerable<JsonRpcParams>>();
+                    plugin.Sink(requestParams);
+                }
+
+                return true;
+            });
+        }
+
+        public async Task FilterPluginAsync<TFilterPlugin>() where TFilterPlugin : INuPluginFilter, new()
+        {
+            await CommandHandler<TFilterPlugin>((req, plugin) =>
+            {
+                if (req.Method == "config")
+                {
+                    return OkResponse(_signature);
+                }
+
+                if (req.Method == "begin_filter")
+                {
+                    OkResponse(plugin.BeginFilter());
+                }
+                else if (req.Method == "filter")
+                {
+                    var requestParams = req.GetParams<JsonRpcParams>();
+
+                    RpcValueResponse(plugin.Filter(requestParams));
+                }
+                else if (req.Method == "end_filter")
+                {
+                    return OkResponse(plugin.EndFilter());
+                }
+
+                return false;
+            });
+        }
+
+        private async Task CommandHandler<TPluginType>(Func<JsonRpcRequest, TPluginType, bool> done) where TPluginType : new()
+        {
+            var plugin = new TPluginType();
 
             using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
             using (_standardOutputWriter = new StreamWriter(_stdout, Console.OutputEncoding))
@@ -56,18 +102,7 @@ namespace Nu.Plugin
 
                     if (request is null || !request.IsValid) { break; }
 
-                    if (request.Method == "config")
-                    {
-                        OkResponse(_signature);
-                        break;
-                    }
-                    else if (request.Method == "sink")
-                    {
-                        var requestParams = request.GetParams<IEnumerable<JsonRpcParams>>();
-                        sink.Sink(requestParams);
-                        break;
-                    }
-                    else
+                    if (done(request, plugin))
                     {
                         break;
                     }
@@ -75,59 +110,17 @@ namespace Nu.Plugin
             }
         }
 
-        public async Task FilterPluginAsync<T>() where T : INuPluginFilter, new()
-        {
-            _signature = _signature.WithIsFilter(true);
-            var filter = new T();
+        private bool OkResponse(object response) => Response(new JsonRpcOkResponse(response));
 
-            using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
-            using (_standardOutputWriter = new StreamWriter(_stdout, Console.OutputEncoding))
-            {
-                _standardOutputWriter.AutoFlush = true;
+        private bool RpcValueResponse(JsonRpcParams rpcParams) => Response(new JsonRpcValueResponse(rpcParams));
 
-                while (true)
-                {
-                    var request = await standardInput.GetNextRequestAsync();
-
-                    if (request is null || !request.IsValid) { break; }
-
-                    if (request.Method == "config")
-                    {
-                        OkResponse(_signature);
-                        break;
-                    }
-                    else if (request.Method == "begin_filter")
-                    {
-                        OkResponse(filter.BeginFilter());
-                    }
-                    else if (request.Method == "filter")
-                    {
-                        var requestParams = request.GetParams<JsonRpcParams>();
-
-                        RpcValueResponse(filter.Filter(requestParams));
-                    }
-                    else if (request.Method == "end_filter")
-                    {
-                        OkResponse(filter.EndFilter());
-                        break;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void OkResponse(object response) => Response(new JsonRpcOkResponse(response));
-
-        private void RpcValueResponse(JsonRpcParams rpcParams) => Response(new JsonRpcValueResponse(rpcParams));
-
-        private void Response(JsonRpcResponse response)
+        private bool Response(JsonRpcResponse response)
         {
             var serializedResponse = JsonSerializer.Serialize(response);
 
             _standardOutputWriter.WriteLine(serializedResponse);
+
+            return true;
         }
     }
 }
