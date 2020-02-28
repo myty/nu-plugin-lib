@@ -43,7 +43,6 @@ namespace Nu.Plugin
 
         public async Task SinkPluginAsync<T>() where T : INuPluginSink, new()
         {
-            _signature = _signature.WithIsFilter(true);
             var sink = new T();
 
             using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
@@ -97,7 +96,7 @@ namespace Nu.Plugin
                         OkResponse(_signature);
                         break;
                     }
-                    else if (_signature.IsFilter && request.Method == "begin_filter")
+                    else if (request.Method == "begin_filter")
                     {
                         OkResponse(filter.BeginFilter());
                     }
