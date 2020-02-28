@@ -100,12 +100,9 @@ namespace Nu.Plugin
                 {
                     var request = await standardInput.GetNextRequestAsync();
 
-                    if (request is null || !request.IsValid) { break; }
-
-                    if (done(request, plugin))
-                    {
-                        break;
-                    }
+                    if (request is null
+                        || !request.IsValid
+                        || done(request, plugin)) { break; }
                 }
             }
         }
