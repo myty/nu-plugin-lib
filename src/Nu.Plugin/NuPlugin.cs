@@ -47,7 +47,7 @@ namespace Nu.Plugin
             {
                 if (req.Method == "config")
                 {
-                    OkResponse(_signature);
+                    Done(_signature);
                 }
                 else if (req.Method == "sink")
                 {
@@ -55,7 +55,7 @@ namespace Nu.Plugin
                     plugin.Sink(requestParams);
                 }
 
-                return true;
+                return Done();
             });
         }
 
@@ -65,29 +65,28 @@ namespace Nu.Plugin
             {
                 if (req.Method == "config")
                 {
-                    return OkResponse(_signature);
+                    return Done(_signature.WithIsFilter(true));
                 }
-
-                if (req.Method == "begin_filter")
+                else if (req.Method == "begin_filter")
                 {
-                    OkResponse(plugin.BeginFilter());
+                    return Continue(plugin.BeginFilter());
                 }
                 else if (req.Method == "filter")
                 {
                     var requestParams = req.GetParams<JsonRpcParams>();
 
-                    RpcValueResponse(plugin.Filter(requestParams));
+                    return RpcValueResponse(plugin.Filter(requestParams));
                 }
                 else if (req.Method == "end_filter")
                 {
-                    return OkResponse(plugin.EndFilter());
+                    return Done(plugin.EndFilter());
                 }
 
-                return false;
+                return Done();
             });
         }
 
-        private async Task CommandHandler<TPluginType>(Func<JsonRpcRequest, TPluginType, bool> done) where TPluginType : new()
+        private async Task CommandHandler<TPluginType>(Func<JsonRpcRequest, TPluginType, PluginResponse> response) where TPluginType : new()
         {
             var plugin = new TPluginType();
 
@@ -100,24 +99,42 @@ namespace Nu.Plugin
                 {
                     var request = await standardInput.GetNextRequestAsync();
 
-                    if (request is null
-                        || !request.IsValid
-                        || done(request, plugin)) { break; }
+                    if (request?.IsValid != true) { break; }
+
+                    switch (response(request, plugin))
+                    {
+                        case DoneResponse done:
+                            break;
+                    }
                 }
             }
         }
 
-        private bool OkResponse(object response) => Response(new JsonRpcOkResponse(response));
+        private PluginResponse Done(object response = null) => response == null
+            ? new DoneResponse()
+            : Response(new JsonRpcOkResponse(response), true);
 
-        private bool RpcValueResponse(JsonRpcParams rpcParams) => Response(new JsonRpcValueResponse(rpcParams));
+        private PluginResponse Continue(object response) => Response(new JsonRpcOkResponse(response));
 
-        private bool Response(JsonRpcResponse response)
+        private PluginResponse RpcValueResponse(JsonRpcParams rpcParams) => Response(new JsonRpcValueResponse(rpcParams));
+
+        private PluginResponse Response(JsonRpcResponse response, bool isDone = false)
         {
             var serializedResponse = JsonSerializer.Serialize(response);
 
             _standardOutputWriter.WriteLine(serializedResponse);
 
-            return true;
+            if (isDone)
+            {
+                return new DoneResponse();
+            }
+
+            return new ContinueResponse();
         }
+
+        internal abstract class PluginResponse { }
+
+        internal class ContinueResponse : PluginResponse { }
+        internal class DoneResponse : PluginResponse { }
     }
 }

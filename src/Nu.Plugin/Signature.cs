@@ -28,16 +28,16 @@ namespace Nu.Plugin
         public int[] Positional { get; } = Array.Empty<int>();
 
         [JsonPropertyName("rest_positional")]
-        public int[] RestPositional { get; } = Array.Empty<int>();
+        public int[] RestPositional { get; } = null;
 
         [JsonPropertyName("named")]
         public object Named { get; } = new { };
 
         [JsonPropertyName("yields")]
-        public object Yields { get; } = new { };
+        public object Yields { get; } = null;
 
         [JsonPropertyName("input")]
-        public object Input { get; } = new { };
+        public object Input { get; } = null;
 
         [JsonPropertyName("is_filter")]
         public bool IsFilter { get; } = false;
