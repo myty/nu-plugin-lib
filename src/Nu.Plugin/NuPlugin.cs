@@ -19,7 +19,7 @@ namespace Nu.Plugin
             _stdin = stdin;
         }
 
-        public static NuPlugin Build(string name = null)
+        public static NuPlugin Build(string name)
         {
             var stdin = Console.OpenStandardInput();
             var stdout = Console.OpenStandardOutput();

@@ -22,9 +22,10 @@ namespace Nu.Plugin
 
             public void Config(Signature signature)
             {
-                var rpcResponse = JsonRpcResponse.Ok(signature);
+                Respond(
+                    JsonRpcResponse.Ok(signature)
+                );
 
-                Respond(rpcResponse);
                 Done();
             }
 
@@ -42,11 +43,11 @@ namespace Nu.Plugin
             {
                 if (_plugin is INuPluginFilter filterPlugin)
                 {
-                    var rpcResponse = JsonRpcResponse.Ok(
-                        filterPlugin.BeginFilter()
+                    Respond(
+                        JsonRpcResponse.Ok(
+                            filterPlugin.BeginFilter()
+                        )
                     );
-
-                    Respond(rpcResponse);
                 }
 
                 Continue();
@@ -70,14 +71,14 @@ namespace Nu.Plugin
             {
                 if (_plugin is INuPluginFilter filterPlugin)
                 {
-                    var rpcResponse = JsonRpcResponse.Ok(
-                        filterPlugin.EndFilter()
+                    Respond(
+                        JsonRpcResponse.Ok(
+                            filterPlugin.EndFilter()
+                        )
                     );
-
-                    Respond(rpcResponse);
                 }
 
-                Continue();
+                Done();
             }
 
             public void Quit() => Done();
