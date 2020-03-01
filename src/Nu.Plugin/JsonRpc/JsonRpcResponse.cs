@@ -4,8 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace Nu.Plugin
 {
-    internal abstract class JsonRpcResponse
+    internal class JsonRpcResponse
     {
+        public JsonRpcResponse(object rpcResponseParams) => Params = rpcResponseParams;
+
         [JsonPropertyName("jsonrpc")]
         public string JsonRPC { get; } = "2.0";
 
@@ -13,6 +15,20 @@ namespace Nu.Plugin
         public string Method { get; } = "response";
 
         [JsonPropertyName("params")]
-        public abstract object Params { get; }
+        public object Params { get; }
+
+        public static JsonRpcResponse Ok(object okResponseParams) =>
+            new JsonRpcResponse(new {
+                Ok = okResponseParams
+            });
+
+        public static JsonRpcResponse RpcValue(object rpcParams) =>
+            Ok(new object[] {
+                new {
+                    Ok = new {
+                        Value = rpcParams
+                    }
+                }
+            });
     }
 }
