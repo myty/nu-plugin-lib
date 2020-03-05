@@ -8,9 +8,9 @@ namespace Nu.Plugin.Len
     internal class Program : INuPluginFilter
     {
         private static async Task Main() => await NuPlugin
-                                                  .Build("len")
-                                                  .Description("Return the length of a string")
-                                                  .FilterPluginAsync<Program>();
+            .Build("len")
+            .Description("Return the length of a string")
+            .FilterPluginAsync<Program>();
 
         public object BeginFilter() => Array.Empty<string>();
 

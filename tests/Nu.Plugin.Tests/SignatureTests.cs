@@ -68,13 +68,13 @@ namespace Nu.Plugin.Tests
 
             // Act
             var newSignature = _signature
-                               .WithDescription(expectedDescriptionValue)
-                               .WithName(expectedNameValue)
-                               .WithIsFilter(expectedIsFilterValue);
+                .WithDescription(expectedDescriptionValue)
+                .WithName(expectedNameValue)
+                .WithIsFilter(expectedIsFilterValue);
 
             // Assert
             Assert.NotEqual(_signature, newSignature);
-            
+
             Assert.Equal(newSignature.Description, expectedDescriptionValue);
             Assert.Equal(newSignature.Name,        expectedNameValue);
             Assert.Equal(newSignature.IsFilter,    expectedIsFilterValue);
