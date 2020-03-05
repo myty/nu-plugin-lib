@@ -44,18 +44,20 @@ namespace Nu.Plugin
             await CommandHandler<TSinkPlugin>(
                 (req, res) =>
                 {
-                    if (req.Method == "config")
+                    switch (req.Method)
                     {
-                        res.Config(_signature);
-                    }
-                    else if (req.Method == "sink")
-                    {
-                        var requestParams = req.GetParams<IEnumerable<JsonRpcParams>>();
-                        res.Sink(requestParams);
-                    }
-                    else
-                    {
-                        res.Quit();
+                        case "config":
+                            res.Config(_signature);
+                            break;
+                        case "sink":
+                        {
+                            var requestParams = req.GetParams<IEnumerable<JsonRpcParams>>();
+                            res.Sink(requestParams);
+                            break;
+                        }
+                        default:
+                            res.Quit();
+                            break;
                     }
                 }
             );
@@ -66,25 +68,23 @@ namespace Nu.Plugin
             await CommandHandler<TFilterPlugin>(
                 (req, res) =>
                 {
-                    if (req.Method == "config")
+                    switch (req.Method)
                     {
-                        res.Config(_signature.WithIsFilter(true));
-                    }
-                    else if (req.Method == "begin_filter")
-                    {
-                        res.BeginFilter();
-                    }
-                    else if (req.Method == "filter")
-                    {
-                        res.Filter(req.GetParams<JsonRpcParams>());
-                    }
-                    else if (req.Method == "end_filter")
-                    {
-                        res.EndFilter();
-                    }
-                    else
-                    {
-                        res.Quit();
+                        case "config":
+                            res.Config(_signature.WithIsFilter(true));
+                            break;
+                        case "begin_filter":
+                            res.BeginFilter();
+                            break;
+                        case "filter":
+                            res.Filter(req.GetParams<JsonRpcParams>());
+                            break;
+                        case "end_filter":
+                            res.EndFilter();
+                            break;
+                        default:
+                            res.Quit();
+                            break;
                     }
                 }
             );

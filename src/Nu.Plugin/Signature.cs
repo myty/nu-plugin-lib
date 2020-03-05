@@ -9,13 +9,17 @@ namespace Nu.Plugin
         {
         }
 
-        private Signature(string name, string usage, bool isFilter, int[] positional, object named)
+        private Signature(
+            string name,   string usage, bool isFilter, int[] positional, int[] restPositional, object named,
+            object yields, object input
+        )
         {
-            IsFilter    = isFilter;
-            Name        = name;
-            Description = usage;
-            Named       = named;
-            Positional  = positional;
+            IsFilter       = isFilter;
+            Name           = name;
+            Description    = usage;
+            Named          = named;
+            Positional     = positional;
+            RestPositional = restPositional;
         }
 
         public static Signature Create() => new Signature();
@@ -49,7 +53,10 @@ namespace Nu.Plugin
             this.Description,
             this.IsFilter,
             this.Positional,
-            this.Named
+            this.RestPositional,
+            this.Named,
+            this.Yields,
+            this.Input
         );
 
         public Signature WithDescription(string description) => new Signature(
@@ -57,7 +64,10 @@ namespace Nu.Plugin
             description,
             this.IsFilter,
             this.Positional,
-            this.Named
+            this.RestPositional,
+            this.Named,
+            this.Yields,
+            this.Input
         );
 
         public Signature WithIsFilter(bool isFilter) => new Signature(
@@ -65,7 +75,10 @@ namespace Nu.Plugin
             this.Description,
             isFilter,
             this.Positional,
-            this.Named
+            this.RestPositional,
+            this.Named,
+            this.Yields,
+            this.Input
         );
     }
 }
