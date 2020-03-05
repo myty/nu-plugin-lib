@@ -6,7 +6,7 @@ using Nu.Plugin.Interfaces;
 
 namespace Nu.Plugin
 {
-    public partial class NuPlugin
+    public class NuPlugin
     {
         private readonly Stream    _stdin;
         private readonly Stream    _stdout;
