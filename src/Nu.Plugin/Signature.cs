@@ -20,6 +20,8 @@ namespace Nu.Plugin
             Named          = named;
             Positional     = positional;
             RestPositional = restPositional;
+            Yields         = yields;
+            Input          = input;
         }
 
         public static Signature Create() => new Signature();
@@ -34,16 +36,16 @@ namespace Nu.Plugin
         public int[] Positional { get; } = Array.Empty<int>();
 
         [JsonPropertyName("rest_positional")]
-        public int[] RestPositional { get; } = null;
+        public int[] RestPositional { get; }
 
         [JsonPropertyName("named")]
         public object Named { get; } = new { };
 
         [JsonPropertyName("yields")]
-        public object Yields { get; } = null;
+        public object Yields { get; }
 
         [JsonPropertyName("input")]
-        public object Input { get; } = null;
+        public object Input { get; }
 
         [JsonPropertyName("is_filter")]
         public bool IsFilter { get; }

@@ -27,12 +27,6 @@ namespace Nu.Plugin
             return new NuPlugin(stdin, stdout, name);
         }
 
-        private NuPlugin Name(string name)
-        {
-            _signature = _signature.WithName(name);
-            return this;
-        }
-
         public NuPlugin Description(string description)
         {
             _signature = _signature.WithDescription(description);
