@@ -2,8 +2,8 @@ namespace Nu.Plugin.Interfaces
 {
     public interface INuPluginFilter
     {
-        object BeginFilter();
+        object        BeginFilter();
         JsonRpcParams Filter(JsonRpcParams requestParams);
-        object EndFilter();
+        object        EndFilter();
     }
 }

@@ -8,26 +8,26 @@ namespace Nu.Plugin
 {
     public partial class NuPlugin
     {
-        private readonly Stream _stdin;
-        private readonly Stream _stdout;
+        private readonly Stream    _stdin;
+        private readonly Stream    _stdout;
+        private          Signature _signature = Signature.Create();
 
-        private Signature _signature = Signature.Create();
-
-        private NuPlugin(Stream stdin, Stream stdout)
+        private NuPlugin(Stream stdin, Stream stdout, string name)
         {
-            _stdout = stdout;
-            _stdin = stdin;
+            _stdout    = stdout;
+            _stdin     = stdin;
+            _signature = _signature.WithName(name);
         }
 
         public static NuPlugin Build(string name)
         {
-            var stdin = Console.OpenStandardInput();
+            var stdin  = Console.OpenStandardInput();
             var stdout = Console.OpenStandardOutput();
 
-            return new NuPlugin(stdin, stdout).Name(name);
+            return new NuPlugin(stdin, stdout, name);
         }
 
-        public NuPlugin Name(string name)
+        private NuPlugin Name(string name)
         {
             _signature = _signature.WithName(name);
             return this;
@@ -41,49 +41,63 @@ namespace Nu.Plugin
 
         public async Task SinkPluginAsync<TSinkPlugin>() where TSinkPlugin : INuPluginSink, new()
         {
-            await CommandHandler<TSinkPlugin>((req, res) =>
-            {
-                if (req.Method == "config")
+            await CommandHandler<TSinkPlugin>(
+                (req, res) =>
                 {
-                    res.Config(_signature);
+                    if (req.Method == "config")
+                    {
+                        res.Config(_signature);
+                    }
+                    else if (req.Method == "sink")
+                    {
+                        var requestParams = req.GetParams<IEnumerable<JsonRpcParams>>();
+                        res.Sink(requestParams);
+                    }
+                    else
+                    {
+                        res.Quit();
+                    }
                 }
-                else if (req.Method == "sink")
-                {
-                    var requestParams = req.GetParams<IEnumerable<JsonRpcParams>>();
-                    res.Sink(requestParams);
-                }
-                else
-                {
-                    res.Quit();
-                }
-            });
+            );
         }
 
         public async Task FilterPluginAsync<TFilterPlugin>() where TFilterPlugin : INuPluginFilter, new()
         {
-            await CommandHandler<TFilterPlugin>((req, res) =>
+            await CommandHandler<TFilterPlugin>(
+                (req, res) =>
+                {
+                    if (req.Method == "config")
+                    {
+                        res.Config(_signature.WithIsFilter(true));
+                    }
+                    else if (req.Method == "begin_filter")
+                    {
+                        res.BeginFilter();
+                    }
+                    else if (req.Method == "filter")
+                    {
+                        res.Filter(req.GetParams<JsonRpcParams>());
+                    }
+                    else if (req.Method == "end_filter")
+                    {
+                        res.EndFilter();
+                    }
+                    else
+                    {
+                        res.Quit();
+                    }
+                }
+            );
+        }
+
+        private async Task CommandHandler<TPluginType>(
+            Action<JsonRpcRequest, PluginResponse<TPluginType>> pluginRes
+        ) where TPluginType : new()
+        {
+            using var handler = PluginHandler<TPluginType>.Create(_stdin, _stdout);
+            while (await handler.HandleNextRequestAsync(pluginRes))
             {
-                if (req.Method == "config")
-                {
-                    res.Config(_signature.WithIsFilter(true));
-                }
-                else if (req.Method == "begin_filter")
-                {
-                    res.BeginFilter();
-                }
-                else if (req.Method == "filter")
-                {
-                    res.Filter(req.GetParams<JsonRpcParams>());
-                }
-                else if (req.Method == "end_filter")
-                {
-                    res.EndFilter();
-                }
-                else
-                {
-                    res.Quit();
-                }
-            });
+            }
         }
     }
 }

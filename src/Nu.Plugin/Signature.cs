@@ -5,15 +5,17 @@ namespace Nu.Plugin
 {
     internal class Signature
     {
-        private Signature() { }
+        private Signature()
+        {
+        }
 
         private Signature(string name, string usage, bool isFilter, int[] positional, object named)
         {
-            IsFilter = isFilter;
-            Name = name;
+            IsFilter    = isFilter;
+            Name        = name;
             Description = usage;
-            Named = named;
-            Positional = positional;
+            Named       = named;
+            Positional  = positional;
         }
 
         public static Signature Create() => new Signature();
@@ -40,7 +42,7 @@ namespace Nu.Plugin
         public object Input { get; } = null;
 
         [JsonPropertyName("is_filter")]
-        public bool IsFilter { get; } = false;
+        public bool IsFilter { get; }
 
         public Signature WithName(string name) => new Signature(
             name,

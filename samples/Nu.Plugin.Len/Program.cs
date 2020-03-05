@@ -5,12 +5,12 @@ using Nu.Plugin.Interfaces;
 
 namespace Nu.Plugin.Len
 {
-    class Program : INuPluginFilter
+    internal class Program : INuPluginFilter
     {
-        static async Task Main() => await NuPlugin
-            .Build("len")
-            .Description("Return the length of a string")
-            .FilterPluginAsync<Program>();
+        private static async Task Main() => await NuPlugin
+                                                  .Build("len")
+                                                  .Description("Return the length of a string")
+                                                  .FilterPluginAsync<Program>();
 
         public object BeginFilter() => Array.Empty<string>();
 
@@ -18,7 +18,8 @@ namespace Nu.Plugin.Len
         {
             var stringLength = requestParams.Value.Primitive["String"].ToString().Length;
 
-            requestParams.Value.Primitive = new Dictionary<string, object>{
+            requestParams.Value.Primitive = new Dictionary<string, object>
+            {
                 {"Int", stringLength}
             };
 
