@@ -59,6 +59,23 @@ namespace Nu.Plugin.Tests
         }
 
         [Fact]
+        public void Signature_AddNamedSwitch_Returns_New_Object()
+        {
+            // Arrange
+            const string nameSwitch = "switch";
+            const string nameSwitchDescription = "switch description";
+
+            // Act
+            var newSignature = _signature.AddNamedSwitch(nameSwitch, nameSwitchDescription);
+
+            // Assert
+            Assert.True(newSignature.Named.ContainsKey(nameSwitch));
+            Assert.Equal(2, newSignature.Named[nameSwitch].Length);
+            Assert.Equal(typeof(NamedTypeSwitch), newSignature.Named[nameSwitch][0].GetType());
+            Assert.Equal(nameSwitchDescription, newSignature.Named[nameSwitch][1]);
+        }
+
+        [Fact]
         public void Signature_Create_Returns_Default_Values()
         {
             // Arrange
