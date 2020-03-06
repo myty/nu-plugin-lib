@@ -21,5 +21,9 @@
       <_Parameter1>$(MSBuildProjectName).Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Enums" />
+  </ItemGroup>
 
 </Project>

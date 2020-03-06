@@ -1,4 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Nu.Plugin
@@ -10,8 +14,10 @@ namespace Nu.Plugin
         }
 
         private Signature(
-            string name,   string usage, bool isFilter, int[] positional, int[] restPositional, object named,
-            object yields, object input
+            string                                name, string usage, bool isFilter, int[] positional,
+            int[]                                 restPositional,
+            IReadOnlyDictionary<string, object[]> named,
+            object                                yields, object input
         )
         {
             IsFilter       = isFilter;
@@ -39,7 +45,9 @@ namespace Nu.Plugin
         public int[] RestPositional { get; }
 
         [JsonPropertyName("named")]
-        public object Named { get; } = new { };
+        public IReadOnlyDictionary<string, object[]> Named { get; } =
+            new Dictionary<string, object[]>
+                {{"help", new object[] {new NamedTypeSwitch('h'), "Display this help message"}}};
 
         [JsonPropertyName("yields")]
         public object Yields { get; }
@@ -82,5 +90,47 @@ namespace Nu.Plugin
             this.Yields,
             this.Input
         );
+
+        public Signature AddNamedSwitch(string name, string description, char? flag = null)
+        {
+            if (!flag.HasValue)
+            {
+                flag = name.FirstOrDefault();
+            }
+
+            var namedTypeSwitch = new NamedTypeSwitch(flag.Value);
+            var named           = this.Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            named.Add(name, new object[] {namedTypeSwitch, description});
+
+            return new Signature(
+                this.Name,
+                this.Description,
+                this.IsFilter,
+                this.Positional,
+                this.RestPositional,
+                named,
+                this.Yields,
+                this.Input
+            );
+        }
+
+        public Signature AddNamedOptional(string name, SyntaxShape syntaxShape, string description, char? flag = null)
+        {
+            var flagValue         = new string(new char[] {flag ?? name.FirstOrDefault()});
+            var namedTypeOptional = new NamedTypeOptional(new string[] {flagValue, syntaxShape.Shape});
+            var named             = this.Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            named.Add(name, new object[] {namedTypeOptional, description});
+
+            return new Signature(
+                this.Name,
+                this.Description,
+                this.IsFilter,
+                this.Positional,
+                this.RestPositional,
+                named,
+                this.Yields,
+                this.Input
+            );
+        }
     }
 }

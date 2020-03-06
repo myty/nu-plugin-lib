@@ -1,31 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Nu.Plugin.Interfaces;
+﻿using System.Threading.Tasks;
 
 namespace Nu.Plugin.Len
 {
-    internal class Program : INuPluginFilter
+    internal static class Program
     {
         private static async Task Main() => await NuPlugin
             .Build("len")
             .Description("Return the length of a string")
-            .FilterPluginAsync<Program>();
-
-        public object BeginFilter() => Array.Empty<string>();
-
-        public JsonRpcParams Filter(JsonRpcParams requestParams)
-        {
-            var stringLength = requestParams.Value.Primitive["String"].ToString().Length;
-
-            requestParams.Value.Primitive = new Dictionary<string, object>
-            {
-                {"Int", stringLength}
-            };
-
-            return requestParams;
-        }
-
-        public object EndFilter() => Array.Empty<string>();
+            .Switch("all", "All of everything")
+            .Named("copy", SyntaxShape.Any, "")
+            .FilterAsync<LengthFilter>();
     }
 }

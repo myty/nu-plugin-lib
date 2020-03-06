@@ -33,7 +33,19 @@ namespace Nu.Plugin
             return this;
         }
 
-        public async Task SinkPluginAsync<TSinkPlugin>() where TSinkPlugin : INuPluginSink, new()
+        public NuPlugin Switch(string name, string description, char? flag = null)
+        {
+            _signature = _signature.AddNamedSwitch(name, description, flag);
+            return this;
+        }
+
+        public NuPlugin Named(string name, SyntaxShape syntaxShape, string description, char? flag = null)
+        {
+            _signature = _signature.AddNamedOptional(name, syntaxShape, description, flag);
+            return this;
+        }
+
+        public async Task SinkAsync<TSinkPlugin>() where TSinkPlugin : INuPluginSink, new()
         {
             await CommandHandler<TSinkPlugin>(
                 (req, res) =>
@@ -57,7 +69,7 @@ namespace Nu.Plugin
             );
         }
 
-        public async Task FilterPluginAsync<TFilterPlugin>() where TFilterPlugin : INuPluginFilter, new()
+        public async Task FilterAsync<TFilterPlugin>() where TFilterPlugin : INuPluginFilter, new()
         {
             await CommandHandler<TFilterPlugin>(
                 (req, res) =>
