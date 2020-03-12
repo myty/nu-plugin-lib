@@ -45,7 +45,7 @@ namespace Nu.Plugin
                 return JsonSerializer.Deserialize<T>(json);
             }
 
-            return default(T);
+            return default;
         }
 
         public bool IsValid => _isValid;

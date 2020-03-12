@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -14,20 +12,20 @@ namespace Nu.Plugin
         }
 
         private Signature(
-            string                                name, string usage, bool isFilter, int[] positional,
-            int[]                                 restPositional,
+            string name, string usage, bool isFilter, int[] positional,
+            int[] restPositional,
             IReadOnlyDictionary<string, object[]> named,
-            object                                yields, object input
+            object yields, object input
         )
         {
-            IsFilter       = isFilter;
-            Name           = name;
-            Description    = usage;
-            Named          = named;
-            Positional     = positional;
+            IsFilter = isFilter;
+            Name = name;
+            Description = usage;
+            Named = named;
+            Positional = positional;
             RestPositional = restPositional;
-            Yields         = yields;
-            Input          = input;
+            Yields = yields;
+            Input = input;
         }
 
         public static Signature Create() => new Signature();
@@ -60,38 +58,38 @@ namespace Nu.Plugin
 
         public Signature WithName(string name) => new Signature(
             name,
-            this.Description,
-            this.IsFilter,
-            this.Positional,
-            this.RestPositional,
-            this.Named,
-            this.Yields,
-            this.Input
+            Description,
+            IsFilter,
+            Positional,
+            RestPositional,
+            Named,
+            Yields,
+            Input
         );
 
         public Signature WithDescription(string description) => new Signature(
-            this.Name,
+            Name,
             description,
-            this.IsFilter,
-            this.Positional,
-            this.RestPositional,
-            this.Named,
-            this.Yields,
-            this.Input
+            IsFilter,
+            Positional,
+            RestPositional,
+            Named,
+            Yields,
+            Input
         );
 
         public Signature WithIsFilter(bool isFilter) => new Signature(
-            this.Name,
-            this.Description,
+            Name,
+            Description,
             isFilter,
-            this.Positional,
-            this.RestPositional,
-            this.Named,
-            this.Yields,
-            this.Input
+            Positional,
+            RestPositional,
+            Named,
+            Yields,
+            Input
         );
 
-        public Signature AddNamedSwitch(string name, string description, char? flag = null)
+        public Signature AddSwitch(string name, string description, char? flag = null)
         {
             if (!flag.HasValue)
             {
@@ -99,37 +97,56 @@ namespace Nu.Plugin
             }
 
             var namedTypeSwitch = new NamedTypeSwitch(flag.Value);
-            var named           = this.Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            named.Add(name, new object[] {namedTypeSwitch, description});
+            var named = Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            named.Add(name, new object[] { namedTypeSwitch, description });
 
             return new Signature(
-                this.Name,
-                this.Description,
-                this.IsFilter,
-                this.Positional,
-                this.RestPositional,
+                Name,
+                Description,
+                IsFilter,
+                Positional,
+                RestPositional,
                 named,
-                this.Yields,
-                this.Input
+                Yields,
+                Input
             );
         }
 
-        public Signature AddNamedOptional(string name, SyntaxShape syntaxShape, string description, char? flag = null)
+        public Signature AddOptional(SyntaxShape syntaxShape, string name, string description, char? flag = null)
         {
-            var flagValue         = new string(new char[] {flag ?? name.FirstOrDefault()});
-            var namedTypeOptional = new NamedTypeOptional(new string[] {flagValue, syntaxShape.Shape});
-            var named             = this.Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            named.Add(name, new object[] {namedTypeOptional, description});
+            var flagValue = new string(new char[] { flag ?? name.FirstOrDefault() });
+            var namedTypeOptional = new NamedTypeOptional(new string[] { flagValue, syntaxShape.Shape });
+            var named = Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            named.Add(name, new object[] { namedTypeOptional, description });
 
             return new Signature(
-                this.Name,
-                this.Description,
-                this.IsFilter,
-                this.Positional,
-                this.RestPositional,
+                Name,
+                Description,
+                IsFilter,
+                Positional,
+                RestPositional,
                 named,
-                this.Yields,
-                this.Input
+                Yields,
+                Input
+            );
+        }
+
+        public Signature AddRequired(SyntaxShape syntaxShape, string name, string description, char? flag = null)
+        {
+            var flagValue = new string(new char[] { flag ?? name.FirstOrDefault() });
+            var namedTypeMandatory = new NamedTypeMandatory(new string[] { flagValue, syntaxShape.Shape });
+            var named = Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            named.Add(name, new object[] { namedTypeMandatory, description });
+
+            return new Signature(
+                Name,
+                Description,
+                IsFilter,
+                Positional,
+                RestPositional,
+                named,
+                Yields,
+                Input
             );
         }
     }

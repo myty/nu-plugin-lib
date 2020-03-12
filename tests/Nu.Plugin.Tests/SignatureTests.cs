@@ -17,14 +17,14 @@ namespace Nu.Plugin.Tests
         public void Signature_WithDescription_Returns_New_Object()
         {
             // Arrange
-            const string expectedValue = nameof(Signature.Description);
+            var expectedValue = nameof(Signature.Description);
 
             // Act
             var newSignature = _signature.WithDescription(expectedValue);
 
             // Assert
             Assert.Equal(newSignature.Description, expectedValue);
-            Assert.NotEqual(_signature,             newSignature);
+            Assert.NotEqual(_signature, newSignature);
             Assert.NotEqual(_signature.Description, newSignature.Description);
         }
 
@@ -32,14 +32,14 @@ namespace Nu.Plugin.Tests
         public void Signature_WithName_Returns_New_Object()
         {
             // Arrange
-            const string expectedValue = nameof(Signature.Name);
+            var expectedValue = nameof(Signature.Name);
 
             // Act
             var newSignature = _signature.WithName(expectedValue);
 
             // Assert
             Assert.Equal(newSignature.Name, expectedValue);
-            Assert.NotEqual(_signature,      newSignature);
+            Assert.NotEqual(_signature, newSignature);
             Assert.NotEqual(_signature.Name, newSignature.Name);
         }
 
@@ -47,26 +47,26 @@ namespace Nu.Plugin.Tests
         public void Signature_WithIsFilter_Returns_New_Object()
         {
             // Arrange
-            const bool expectedValue = true;
+            var expectedValue = true;
 
             // Act
             var newSignature = _signature.WithIsFilter(expectedValue);
 
             // Assert
             Assert.Equal(newSignature.IsFilter, expectedValue);
-            Assert.NotEqual(_signature,          newSignature);
+            Assert.NotEqual(_signature, newSignature);
             Assert.NotEqual(_signature.IsFilter, newSignature.IsFilter);
         }
 
         [Fact]
-        public void Signature_AddNamedSwitch_Returns_New_Object()
+        public void Signature_AddSwitch_Returns_New_Object()
         {
             // Arrange
-            const string nameSwitch = "switch";
-            const string nameSwitchDescription = "switch description";
+            var nameSwitch = "switch";
+            var nameSwitchDescription = "switch description";
 
             // Act
-            var newSignature = _signature.AddNamedSwitch(nameSwitch, nameSwitchDescription);
+            var newSignature = _signature.AddSwitch(nameSwitch, nameSwitchDescription);
 
             // Assert
             Assert.True(newSignature.Named.ContainsKey(nameSwitch));
@@ -76,12 +76,60 @@ namespace Nu.Plugin.Tests
         }
 
         [Fact]
+        public void Signature_AddOptional_Returns_New_Object()
+        {
+            // Arrange
+            var nameOptional = "optional";
+            var nameOptionalDescription = "optional description";
+            var nameOptionalShape = SyntaxShape.Int;
+
+            // Act
+            var newSignature = _signature.AddOptional(nameOptionalShape, nameOptional, nameOptionalDescription);
+
+            // Assert
+            Assert.True(newSignature.Named.ContainsKey(nameOptional));
+
+            var optionalNamedParameter = newSignature.Named[nameOptional];
+            Assert.Equal(2, optionalNamedParameter.Length);
+            Assert.Equal(nameOptionalDescription, optionalNamedParameter[1]);
+
+            var actualOptionalObj = optionalNamedParameter[0] as NamedTypeOptional;
+            Assert.NotNull(actualOptionalObj);
+            Assert.Equal("o", actualOptionalObj.Optional[0]);
+            Assert.Equal(nameOptionalShape.Shape, actualOptionalObj.Optional[1]);
+        }
+
+        [Fact]
+        public void Signature_AddRequired_Returns_New_Object()
+        {
+            // Arrange
+            var nameOptional = "required";
+            var nameOptionalDescription = "required description";
+            var nameOptionalShape = SyntaxShape.Path;
+
+            // Act
+            var newSignature = _signature.AddRequired(nameOptionalShape, nameOptional, nameOptionalDescription);
+
+            // Assert
+            Assert.True(newSignature.Named.ContainsKey(nameOptional));
+
+            var optionalNamedParameter = newSignature.Named[nameOptional];
+            Assert.Equal(2, optionalNamedParameter.Length);
+            Assert.Equal(nameOptionalDescription, optionalNamedParameter[1]);
+
+            var actualOptionalObj = optionalNamedParameter[0] as NamedTypeMandatory;
+            Assert.NotNull(actualOptionalObj);
+            Assert.Equal("r", actualOptionalObj.Mandatory[0]);
+            Assert.Equal(nameOptionalShape.Shape, actualOptionalObj.Mandatory[1]);
+        }
+
+        [Fact]
         public void Signature_Create_Returns_Default_Values()
         {
             // Arrange
-            const string expectedDescriptionValue = nameof(Signature.Description);
-            const string expectedNameValue        = nameof(Signature.Name);
-            const bool   expectedIsFilterValue    = true;
+            var expectedDescriptionValue = nameof(Signature.Description);
+            var expectedNameValue = nameof(Signature.Name);
+            var expectedIsFilterValue = true;
 
             // Act
             var newSignature = _signature
@@ -91,10 +139,9 @@ namespace Nu.Plugin.Tests
 
             // Assert
             Assert.NotEqual(_signature, newSignature);
-
             Assert.Equal(newSignature.Description, expectedDescriptionValue);
-            Assert.Equal(newSignature.Name,        expectedNameValue);
-            Assert.Equal(newSignature.IsFilter,    expectedIsFilterValue);
+            Assert.Equal(newSignature.Name, expectedNameValue);
+            Assert.Equal(newSignature.IsFilter, expectedIsFilterValue);
         }
     }
 }
