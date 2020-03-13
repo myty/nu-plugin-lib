@@ -12,8 +12,11 @@ namespace Nu.Plugin
         }
 
         private Signature(
-            string name, string usage, bool isFilter, int[] positional,
-            int[] restPositional,
+            string name,
+            string usage,
+            bool isFilter,
+            object[][] positional,
+            string[] restPositional,
             IReadOnlyDictionary<string, object[]> named,
             object yields, object input
         )
@@ -37,10 +40,10 @@ namespace Nu.Plugin
         public string Description { get; }
 
         [JsonPropertyName("positional")]
-        public int[] Positional { get; } = Array.Empty<int>();
+        public object[][] Positional { get; } = Array.Empty<object[]>();
 
         [JsonPropertyName("rest_positional")]
-        public int[] RestPositional { get; }
+        public string[] RestPositional { get; } = null;
 
         [JsonPropertyName("named")]
         public IReadOnlyDictionary<string, object[]> Named { get; } =
@@ -89,6 +92,82 @@ namespace Nu.Plugin
             Input
         );
 
+        public Signature AddRequiredPositional(SyntaxShape syntaxShape, string name, string description)
+        {
+            var positionalArgument = new object[]
+            {
+                new MandatoryPostionalType(name, syntaxShape),
+                description
+            };
+
+            var newPositionalArguments = new object[Positional.Length + 1][];
+            if (Positional.Length > 0)
+            {
+                Positional.CopyTo(newPositionalArguments, 0);
+            }
+
+            newPositionalArguments[Positional.Length] = positionalArgument;
+
+            return new Signature(
+                Name,
+                Description,
+                IsFilter,
+                newPositionalArguments,
+                RestPositional,
+                Named,
+                Yields,
+                Input
+            );
+        }
+
+        public Signature AddOptionalPositional(SyntaxShape syntaxShape, string name, string description)
+        {
+            var positionalArgument = new object[]
+            {
+                new OptionalPostionalType(name, syntaxShape),
+                description
+            };
+
+            var newPositionalArguments = new object[Positional.Length + 1][];
+            if (Positional.Length > 0)
+            {
+                Positional.CopyTo(newPositionalArguments, 0);
+            }
+
+            newPositionalArguments[Positional.Length] = positionalArgument;
+
+            return new Signature(
+                Name,
+                Description,
+                IsFilter,
+                newPositionalArguments,
+                RestPositional,
+                Named,
+                Yields,
+                Input
+            );
+        }
+
+        public Signature AddRestPositionalArguments(string description, SyntaxShape syntaxShape = null)
+        {
+            var newRestPositional = new string[]
+            {
+                (syntaxShape ?? SyntaxShape.Any).Shape,
+                description
+            };
+
+            return new Signature(
+                Name,
+                Description,
+                IsFilter,
+                Positional,
+                newRestPositional,
+                Named,
+                Yields,
+                Input
+            );
+        }
+
         public Signature AddSwitch(string name, string description, char? flag = null)
         {
             if (!flag.HasValue)
@@ -112,10 +191,10 @@ namespace Nu.Plugin
             );
         }
 
-        public Signature AddOptional(SyntaxShape syntaxShape, string name, string description, char? flag = null)
+        public Signature AddOptionalNamed(SyntaxShape syntaxShape, string name, string description, char? flag = null)
         {
             var flagValue = new string(new char[] { flag ?? name.FirstOrDefault() });
-            var namedTypeOptional = new NamedTypeOptional(new string[] { flagValue, syntaxShape.Shape });
+            var namedTypeOptional = new NamedTypeOptional(flagValue, syntaxShape);
             var named = Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             named.Add(name, new object[] { namedTypeOptional, description });
 
@@ -131,10 +210,10 @@ namespace Nu.Plugin
             );
         }
 
-        public Signature AddRequired(SyntaxShape syntaxShape, string name, string description, char? flag = null)
+        public Signature AddRequiredNamed(SyntaxShape syntaxShape, string name, string description, char? flag = null)
         {
             var flagValue = new string(new char[] { flag ?? name.FirstOrDefault() });
-            var namedTypeMandatory = new NamedTypeMandatory(new string[] { flagValue, syntaxShape.Shape });
+            var namedTypeMandatory = new NamedTypeMandatory(flagValue, syntaxShape);
             var named = Named.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             named.Add(name, new object[] { namedTypeMandatory, description });
 

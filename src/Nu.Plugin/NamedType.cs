@@ -14,7 +14,8 @@ namespace Nu.Plugin
 
     public class NamedTypeMandatory : INamedType
     {
-        public NamedTypeMandatory(string[] mandatory) => Mandatory = mandatory;
+        public NamedTypeMandatory(string flagValue) : this(flagValue, SyntaxShape.Any) { }
+        public NamedTypeMandatory(string flagValue, SyntaxShape syntax) => Mandatory = new string[] { flagValue, syntax.Shape };
 
         [JsonPropertyName("Mandatory")]
         public string[] Mandatory { get; }
@@ -22,7 +23,8 @@ namespace Nu.Plugin
 
     public class NamedTypeOptional : INamedType
     {
-        public NamedTypeOptional(string[] optional) => Optional = optional;
+        public NamedTypeOptional(string flagValue) : this(flagValue, SyntaxShape.Any) { }
+        public NamedTypeOptional(string flagValue, SyntaxShape syntax) => Optional = new string[] { flagValue, syntax.Shape };
 
         [JsonPropertyName("Optional")]
         public string[] Optional { get; }

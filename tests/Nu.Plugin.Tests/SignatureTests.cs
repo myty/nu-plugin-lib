@@ -76,7 +76,7 @@ namespace Nu.Plugin.Tests
         }
 
         [Fact]
-        public void Signature_AddOptional_Returns_New_Object()
+        public void Signature_AddOptionalNamed_Returns_New_Object()
         {
             // Arrange
             var nameOptional = "optional";
@@ -84,7 +84,7 @@ namespace Nu.Plugin.Tests
             var nameOptionalShape = SyntaxShape.Int;
 
             // Act
-            var newSignature = _signature.AddOptional(nameOptionalShape, nameOptional, nameOptionalDescription);
+            var newSignature = _signature.AddOptionalNamed(nameOptionalShape, nameOptional, nameOptionalDescription);
 
             // Assert
             Assert.True(newSignature.Named.ContainsKey(nameOptional));
@@ -100,7 +100,7 @@ namespace Nu.Plugin.Tests
         }
 
         [Fact]
-        public void Signature_AddRequired_Returns_New_Object()
+        public void Signature_AddRequiredNamed_Returns_New_Object()
         {
             // Arrange
             var nameOptional = "required";
@@ -108,7 +108,7 @@ namespace Nu.Plugin.Tests
             var nameOptionalShape = SyntaxShape.Path;
 
             // Act
-            var newSignature = _signature.AddRequired(nameOptionalShape, nameOptional, nameOptionalDescription);
+            var newSignature = _signature.AddRequiredNamed(nameOptionalShape, nameOptional, nameOptionalDescription);
 
             // Assert
             Assert.True(newSignature.Named.ContainsKey(nameOptional));

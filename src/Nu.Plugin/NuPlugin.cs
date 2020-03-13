@@ -33,22 +33,50 @@ namespace Nu.Plugin
             return this;
         }
 
+        public NuPlugin Required(SyntaxShape syntaxShape, string name, string description)
+        {
+            _signature = _signature.AddRequiredPositional(syntaxShape, name, description);
+            return this;
+        }
+
+        public NuPlugin Optional(SyntaxShape syntaxShape, string name, string description)
+        {
+            _signature = _signature.AddOptionalPositional(syntaxShape, name, description);
+            return this;
+        }
+
         public NuPlugin Switch(string name, string description, char? flag = null)
         {
             _signature = _signature.AddSwitch(name, description, flag);
             return this;
         }
 
-        public NuPlugin Optional(SyntaxShape syntaxShape, string name, string description, char? flag = null)
+        public NuPlugin Named(SyntaxShape syntaxShape, string name, string description, char? flag = null)
         {
-            _signature = _signature.AddOptional(syntaxShape, name, description, flag);
+            _signature = _signature.AddOptionalNamed(syntaxShape, name, description, flag);
             return this;
         }
 
-        public NuPlugin Required(SyntaxShape syntaxShape, string name, string description, char? flag = null)
+        public NuPlugin RequiredNamed(SyntaxShape syntaxShape, string name, string description, char? flag = null)
         {
-            _signature = _signature.AddRequired(syntaxShape, name, description, flag);
+            _signature = _signature.AddRequiredNamed(syntaxShape, name, description, flag);
             return this;
+        }
+
+        public NuPlugin Rest(string description, SyntaxShape syntaxShape = null)
+        {
+            _signature = _signature.AddRestPositionalArguments(description, syntaxShape);
+            return this;
+        }
+
+        public NuPlugin Yields<TInput>()
+        {
+            throw new NotImplementedException("To be implemented in the future");
+        }
+
+        public NuPlugin Input<TInput>()
+        {
+            throw new NotImplementedException("To be implemented in the future");
         }
 
         public async Task SinkAsync<TSinkPlugin>() where TSinkPlugin : INuPluginSink, new()
