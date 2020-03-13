@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Nu.Plugin
 {
-    public class JsonRpcParams
+    public class JsonRpcValue
     {
         [JsonPropertyName("value")]
         public ParamValue Value { get; set; }

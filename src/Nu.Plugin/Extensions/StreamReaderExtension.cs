@@ -9,12 +9,7 @@ namespace Nu.Plugin
         {
             var json = await reader.ReadLineAsync();
 
-            if (!string.IsNullOrEmpty(json?.Trim()))
-            {
-                return new JsonRpcRequest(json);
-            }
-
-            return null;
+            return !string.IsNullOrEmpty(json?.Trim()) ? new JsonRpcRequest(json) : null;
         }
     }
 }

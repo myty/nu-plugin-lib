@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "samples\Nu.Plugin.Len", "sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src\Nu.Plugin", "src\Nu.Plugin\Nu.Plugin.csproj", "{A5740DCA-A481-4F61-A296-BC9733C9225E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nu.Plugin.Tests", "tests\Nu.Plugin.Tests\Nu.Plugin.Tests.csproj", "{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|x64.Build.0 = Release|Any CPU
 		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|x86.ActiveCfg = Release|Any CPU
 		{A5740DCA-A481-4F61-A296-BC9733C9225E}.Release|x86.Build.0 = Release|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Debug|x64.Build.0 = Debug|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Debug|x86.Build.0 = Debug|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Release|x64.ActiveCfg = Release|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Release|x64.Build.0 = Release|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Release|x86.ActiveCfg = Release|Any CPU
+		{31641E0A-9E5B-460D-98DA-E5DDEF00F91C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -4,8 +4,8 @@ namespace Nu.Plugin
 {
     internal class JsonRpcRequest
     {
-        readonly JsonDocument _jsonDoc;
-        readonly bool _isValid = true;
+        private readonly JsonDocument _jsonDoc;
+        private readonly bool         _isValid = true;
 
         public JsonRpcRequest(string json)
         {
@@ -38,7 +38,14 @@ namespace Nu.Plugin
 
         public T GetParams<T>()
         {
-            return JsonSerializer.Deserialize<T>(_jsonDoc.RootElement.GetProperty("params").GetRawText());
+            var json = _jsonDoc?.RootElement.GetProperty("params").GetRawText()?.Trim();
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                return JsonSerializer.Deserialize<T>(json);
+            }
+
+            return default;
         }
 
         public bool IsValid => _isValid;

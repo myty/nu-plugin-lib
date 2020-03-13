@@ -1,31 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Nu.Plugin.Interfaces;
+﻿using System.Threading.Tasks;
 
 namespace Nu.Plugin.Len
 {
-    class Program : INuPluginFilter
+    internal static class Program
     {
-        static async Task Main(string[] args) => await NuPlugin.Create()
-            .Name("len")
-            .Usage("Return the length of a string")
-            .IsFilter<Program>()
-            .RunAsync();
-
-        public object BeginFilter() => Array.Empty<string>();
-
-        public JsonRpcParams Filter(JsonRpcParams requestParams)
-        {
-            var stringLength = requestParams.Value.Primitive["String"].ToString().Length;
-
-            requestParams.Value.Primitive = new Dictionary<string, object>{
-                {"Int", stringLength}
-            };
-
-            return requestParams;
-        }
-
-        public object EndFilter() => Array.Empty<string>();
+        private static async Task Main() => await NuPlugin
+            .Build("len")
+            .Description("Return the length of a string")
+            .Required(SyntaxShape.String, "required_positional", "required positional description")
+            .Optional(SyntaxShape.Int, "optional_positional_1", "optional positional description #1")
+            .Optional(SyntaxShape.Any, "optional_positional_2", "optional positional description #2")
+            .Switch("all", "All of everything")
+            .Named(SyntaxShape.Any, "copy", "copy description")
+            .RequiredNamed(SyntaxShape.String, "required", "required description")
+            .Rest("test rest arguments")
+            .FilterAsync<LengthFilter>();
     }
 }

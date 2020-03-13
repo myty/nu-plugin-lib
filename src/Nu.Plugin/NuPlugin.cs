@@ -1,108 +1,141 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Nu.Plugin.Interfaces;
 
 namespace Nu.Plugin
 {
-    public class NuPlugin : INuPluginBuilder
+    public class NuPlugin
     {
         private readonly Stream _stdin;
         private readonly Stream _stdout;
+        private Signature _signature = Signature.Create();
 
-        private StreamWriter _standardOutputWriter;
-
-        private PluginConfiguration _configuration = PluginConfiguration.Create();
-
-        private INuPluginFilter _filter = null;
-
-        private NuPlugin(Stream stdin, Stream stdout)
+        private NuPlugin(Stream stdin, Stream stdout, string name)
         {
             _stdout = stdout;
             _stdin = stdin;
+            _signature = _signature.WithName(name);
         }
 
-        public async Task RunAsync()
-        {
-            using (var standardInput = new StreamReader(_stdin, Console.InputEncoding))
-            using (_standardOutputWriter = new StreamWriter(_stdout, Console.OutputEncoding))
-            {
-                _standardOutputWriter.AutoFlush = true;
-
-                while (true)
-                {
-                    var request = await standardInput.GetNextRequestAsync();
-
-                    if (request is null || !request.IsValid) { break; }
-
-                    if (request.Method == "config")
-                    {
-                        OkResponse(_configuration);
-                        break;
-                    }
-                    else if (_configuration.IsFilter && request.Method == "begin_filter")
-                    {
-                        OkResponse(_filter.BeginFilter());
-                    }
-                    else if (request.Method == "filter")
-                    {
-                        var requestParams = request.GetParams<JsonRpcParams>();
-
-                        RpcValueResponse(_filter.Filter(requestParams));
-                    }
-                    else if (request.Method == "end_filter")
-                    {
-                        OkResponse(_filter.EndFilter());
-                        break;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void OkResponse(object response) => Response(new JsonRpcOkResponse(response));
-
-        private void RpcValueResponse(JsonRpcParams rpcParams) => Response(new JsonRpcValueResponse(rpcParams));
-
-        private void Response(JsonRpcResponse response)
-        {
-            var serializedResponse = JsonSerializer.Serialize(response);
-
-            _standardOutputWriter.WriteLine(serializedResponse);
-        }
-
-        public static INuPluginBuilder Create(Stream stdin, Stream stdout) => new NuPlugin(stdin, stdout);
-
-        public static INuPluginBuilder Create()
+        public static NuPlugin Build(string name)
         {
             var stdin = Console.OpenStandardInput();
             var stdout = Console.OpenStandardOutput();
 
-            return new NuPlugin(stdin, stdout);
+            return new NuPlugin(stdin, stdout, name);
         }
 
-        public INuPluginBuilder Name(string name)
+        public NuPlugin Description(string description)
         {
-            _configuration = _configuration.WithName(name);
+            _signature = _signature.WithDescription(description);
             return this;
         }
 
-        public INuPluginBuilder Usage(string usage)
+        public NuPlugin Required(SyntaxShape syntaxShape, string name, string description)
         {
-            _configuration = _configuration.WithUsage(usage);
+            _signature = _signature.AddRequiredPositional(syntaxShape, name, description);
             return this;
         }
 
-        public INuPluginBuilder IsFilter<T>() where T : INuPluginFilter, new()
+        public NuPlugin Optional(SyntaxShape syntaxShape, string name, string description)
         {
-            _configuration = _configuration.WithIsFilter(true);
-            _filter = new T();
-
+            _signature = _signature.AddOptionalPositional(syntaxShape, name, description);
             return this;
+        }
+
+        public NuPlugin Switch(string name, string description, char? flag = null)
+        {
+            _signature = _signature.AddSwitch(name, description, flag);
+            return this;
+        }
+
+        public NuPlugin Named(SyntaxShape syntaxShape, string name, string description, char? flag = null)
+        {
+            _signature = _signature.AddOptionalNamed(syntaxShape, name, description, flag);
+            return this;
+        }
+
+        public NuPlugin RequiredNamed(SyntaxShape syntaxShape, string name, string description, char? flag = null)
+        {
+            _signature = _signature.AddRequiredNamed(syntaxShape, name, description, flag);
+            return this;
+        }
+
+        public NuPlugin Rest(string description, SyntaxShape syntaxShape = null)
+        {
+            _signature = _signature.AddRestPositionalArguments(description, syntaxShape);
+            return this;
+        }
+
+        public NuPlugin Yields<TInput>()
+        {
+            throw new NotImplementedException("To be implemented in the future");
+        }
+
+        public NuPlugin Input<TInput>()
+        {
+            throw new NotImplementedException("To be implemented in the future");
+        }
+
+        public async Task SinkAsync<TSinkPlugin>() where TSinkPlugin : INuPluginSink, new()
+        {
+            await CommandHandler<TSinkPlugin>(
+                (req, res) =>
+                {
+                    switch (req.Method)
+                    {
+                        case "config":
+                            res.Config(_signature);
+                            break;
+                        case "sink":
+                            {
+                                var requestParams = req.GetParams<IEnumerable<JsonRpcValue>>();
+                                res.Sink(requestParams);
+                                break;
+                            }
+                        default:
+                            res.Quit();
+                            break;
+                    }
+                }
+            );
+        }
+
+        public async Task FilterAsync<TFilterPlugin>() where TFilterPlugin : INuPluginFilter, new()
+        {
+            await CommandHandler<TFilterPlugin>(
+                (req, res) =>
+                {
+                    switch (req.Method)
+                    {
+                        case "config":
+                            res.Config(_signature.WithIsFilter(true));
+                            break;
+                        case "begin_filter":
+                            res.BeginFilter();
+                            break;
+                        case "filter":
+                            res.Filter(req.GetParams<JsonRpcValue>());
+                            break;
+                        case "end_filter":
+                            res.EndFilter();
+                            break;
+                        default:
+                            res.Quit();
+                            break;
+                    }
+                }
+            );
+        }
+
+        private async Task CommandHandler<TPluginType>(
+            Action<JsonRpcRequest, PluginResponse<TPluginType>> pluginRes
+        ) where TPluginType : new()
+        {
+            using var handler = PluginHandler<TPluginType>.Create(_stdin, _stdout);
+            while (await handler.HandleNextRequestAsync(pluginRes)) { }
         }
     }
 }
