@@ -4,6 +4,6 @@ namespace Nu.Plugin.Interfaces
 {
     public interface INuPluginSink
     {
-        void Sink(IEnumerable<JsonRpcParams> requestParams);
+        void Sink(IEnumerable<JsonRpcValue> requestParams);
     }
 }

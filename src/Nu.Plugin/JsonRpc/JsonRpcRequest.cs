@@ -4,8 +4,8 @@ namespace Nu.Plugin
 {
     internal class JsonRpcRequest
     {
-        readonly JsonDocument _jsonDoc;
-        readonly bool _isValid = true;
+        private readonly JsonDocument _jsonDoc;
+        private readonly bool         _isValid = true;
 
         public JsonRpcRequest(string json)
         {
@@ -45,7 +45,7 @@ namespace Nu.Plugin
                 return JsonSerializer.Deserialize<T>(json);
             }
 
-            return default(T);
+            return default;
         }
 
         public bool IsValid => _isValid;
