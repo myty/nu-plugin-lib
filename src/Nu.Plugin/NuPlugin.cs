@@ -91,7 +91,7 @@ namespace Nu.Plugin
                             break;
                         case "sink":
                             {
-                                var requestParams = req.GetParams<IEnumerable<JsonRpcParams>>();
+                                var requestParams = req.GetParams<IEnumerable<JsonRpcValue>>();
                                 res.Sink(requestParams);
                                 break;
                             }
@@ -117,7 +117,7 @@ namespace Nu.Plugin
                             res.BeginFilter();
                             break;
                         case "filter":
-                            res.Filter(req.GetParams<JsonRpcParams>());
+                            res.Filter(req.GetParams<JsonRpcValue>());
                             break;
                         case "end_filter":
                             res.EndFilter();

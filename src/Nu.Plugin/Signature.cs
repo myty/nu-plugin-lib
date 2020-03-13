@@ -7,9 +7,7 @@ namespace Nu.Plugin
 {
     internal class Signature
     {
-        private Signature()
-        {
-        }
+        private Signature() { }
 
         private Signature(
             string name,

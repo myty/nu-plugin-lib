@@ -1,14 +1,19 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using Nu.Plugin.Interfaces;
+using Nu.Plugin.JsonRpc;
 
 namespace Nu.Plugin.Len
 {
     public class LengthFilter : INuPluginFilter
     {
-        public object BeginFilter() => Array.Empty<string>();
+        public Result<IEnumerable<Result<IReturnSuccess>>> BeginFilter()
+        {
+            return new OkResult<IEnumerable<Result<IReturnSuccess>>>(Enumerable.Empty<Result<IReturnSuccess>>());
+        }
 
-        public JsonRpcParams Filter(JsonRpcParams requestParams)
+        public Result<IEnumerable<Result<IReturnSuccess>>> Filter(JsonRpcValue requestParams)
         {
             var stringLength = requestParams.Value.Primitive["String"].ToString().Length;
 
@@ -17,9 +22,19 @@ namespace Nu.Plugin.Len
                 {"Int", stringLength}
             };
 
-            return requestParams;
+            return new OkResult<IEnumerable<Result<IReturnSuccess>>>(
+                new OkResult<IReturnSuccess>[]
+                {
+                    new OkResult<IReturnSuccess>(
+                        new ValueReturnSuccess(requestParams)
+                    )
+                }
+            );
         }
 
-        public object EndFilter() => Array.Empty<string>();
+        public Result<IEnumerable<Result<IReturnSuccess>>> EndFilter()
+        {
+            return new OkResult<IEnumerable<Result<IReturnSuccess>>>(Enumerable.Empty<Result<IReturnSuccess>>());
+        }
     }
 }

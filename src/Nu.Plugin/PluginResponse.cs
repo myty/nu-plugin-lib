@@ -9,8 +9,8 @@ namespace Nu.Plugin
     internal class PluginResponse<TPluginType> where TPluginType : new()
     {
         private readonly TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool>();
-        private readonly StreamWriter               _writer;
-        private readonly TPluginType                _plugin;
+        private readonly StreamWriter _writer;
+        private readonly TPluginType _plugin;
 
         public PluginResponse(StreamWriter writer, TPluginType plugin)
         {
@@ -25,7 +25,7 @@ namespace Nu.Plugin
             Done();
         }
 
-        public void Sink(IEnumerable<JsonRpcParams> requestParams)
+        public void Sink(IEnumerable<JsonRpcValue> requestParams)
         {
             if (_plugin is INuPluginSink sinkPlugin)
             {
@@ -45,11 +45,11 @@ namespace Nu.Plugin
             Continue();
         }
 
-        public void Filter(JsonRpcParams requestParams)
+        public void Filter(JsonRpcValue requestParams)
         {
             if (_plugin is INuPluginFilter filterPlugin)
             {
-                Respond(JsonRpcResponse.RpcValue(filterPlugin.Filter(requestParams)));
+                Respond(JsonRpcResponse.Ok(filterPlugin.Filter(requestParams)));
             }
 
             Continue();

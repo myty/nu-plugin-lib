@@ -1,4 +1,7 @@
+using System.Linq;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Nu.Plugin.JsonRpc;
 
 namespace Nu.Plugin
 {
@@ -15,26 +18,9 @@ namespace Nu.Plugin
         [JsonPropertyName("params")]
         public object Params { get; }
 
-        public static JsonRpcResponse Ok(object okResponseParams) =>
-            new JsonRpcResponse(
-                new
-                {
-                    Ok = okResponseParams
-                }
-            );
-
-        public static JsonRpcResponse RpcValue(object rpcParams) =>
-            Ok(
-                new object[]
-                {
-                    new
-                    {
-                        Ok = new
-                        {
-                            Value = rpcParams
-                        }
-                    }
-                }
-            );
+        public static JsonRpcResponse Ok(Result result) => new JsonRpcResponse(result);
+        public static JsonRpcResponse Ok(object okResponseParams) => Ok(new OkResult(okResponseParams));
+        public static JsonRpcResponse Ok(IEnumerable<JsonRpcValue> rpcValues) => Ok(rpcValues.Select(v => new OkResult<JsonRpcValue>(v)));
+        public static JsonRpcResponse Ok(JsonRpcValue rpcValue) => Ok(new JsonRpcValue[] { rpcValue });
     }
 }
